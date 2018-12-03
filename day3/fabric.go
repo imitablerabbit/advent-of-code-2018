@@ -45,7 +45,13 @@ func main() {
 	}
 
 	n := calculateOverlaps(claimMap)
+	goodClaims := filterOverlapping(claims, claimMap)
+
 	fmt.Printf("Overlaps: %d\n", n)
+	fmt.Println("Non Overlapping Claims:")
+	for _, c := range goodClaims {
+		fmt.Println(c.ID)
+	}
 }
 
 func parseClaims(lines []string) []*Claim {
@@ -119,4 +125,31 @@ func calculateOverlaps(claimMap [][]*Claim) int {
 		}
 	}
 	return count
+}
+
+func filterOverlapping(claims []*Claim, claimMap [][]*Claim) []*Claim {
+	// Convert to map for easy deletion
+	remaining := make(map[string]*Claim)
+	for _, c := range claims {
+		remaining[c.ID] = c
+	}
+
+	// Delete claims from map if they have overlapped
+	for _, cs := range claimMap {
+		if len(cs) <= 1 {
+			continue
+		}
+		for _, c := range cs {
+			delete(remaining, c.ID)
+		}
+	}
+
+	// Convert back to slice as it makes more sense
+	r := make([]*Claim, len(remaining))
+	i := 0
+	for _, v := range remaining {
+		r[i] = v
+		i++
+	}
+	return r
 }

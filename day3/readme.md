@@ -13,3 +13,9 @@ Count the overlapping claimants.
 ```
 
 ## Part 2
+
+Print out the remaining non-overlapping claim
+
+```bash
+./fabric --file=input.data
+```
