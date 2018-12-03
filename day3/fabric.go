@@ -10,7 +10,8 @@ import (
 )
 
 var (
-	file = flag.String("file", "input.data", "filepath for the input data")
+	file  = flag.String("file", "input.data", "filepath for the input data")
+	print = flag.Bool("print", false, "display the claimant map")
 
 	width  = flag.Int("width", 1000, "width of the fabric")
 	height = flag.Int("height", 1000, "height of the fabric")
@@ -39,19 +40,8 @@ func main() {
 	claimMap := mapClaims(claims, *width, *height)
 
 	// print out the map
-	for w := 0; w < *width; w++ {
-		for h := 0; h < *height; h++ {
-			i := w + (h * *width)
-			c := claimMap[i]
-			s := "."
-			if len(c) == 1 {
-				s = c[0].ID[1:]
-			} else if len(c) > 1 {
-				s = "x"
-			}
-			fmt.Print(s)
-		}
-		fmt.Println()
+	if *print {
+		printMap(claimMap)
 	}
 
 	n := calculateOverlaps(claimMap)
@@ -92,8 +82,8 @@ func mapClaims(claims []*Claim, width, height int) [][]*Claim {
 		start := c.X + (c.Y * width)
 
 		// Loop through the claimaint area
-		for x := c.X; x < c.Width; x++ {
-			for y := c.Y; y < c.Height; y++ {
+		for x := 0; x < c.Width; x++ {
+			for y := 0; y < c.Height; y++ {
 				i := start + x + (y * width)
 				sqi := fabric[i]
 				sqi = append(sqi, c)
@@ -104,7 +94,29 @@ func mapClaims(claims []*Claim, width, height int) [][]*Claim {
 	return fabric
 }
 
-func calculateOverlaps(claims [][]*Claim) int {
+func printMap(m [][]*Claim) {
+	for w := 0; w < *width; w++ {
+		for h := 0; h < *height; h++ {
+			i := w + (h * *width)
+			c := m[i]
+			s := "."
+			if len(c) == 1 {
+				s = c[0].ID[1:]
+			} else if len(c) > 1 {
+				s = "x"
+			}
+			fmt.Print(s)
+		}
+		fmt.Println()
+	}
+}
 
-	return 0
+func calculateOverlaps(claimMap [][]*Claim) int {
+	count := 0
+	for _, claims := range claimMap {
+		if len(claims) > 1 {
+			count++
+		}
+	}
+	return count
 }
