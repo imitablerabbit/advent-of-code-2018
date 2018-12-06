@@ -1,12 +1,27 @@
 #!/usr/bin/env escript
 
+
+% Part 2
+% For each new polymer with the letters removed, reduce the polymer
+
+
+
 main([Filename]) ->
         {ok, Polymer} = read_file(Filename),
         Reduced = reduce_polymer(Polymer),
-        Reduced = reduce_polymer(Reduced),
         %io:format("Starting Polymer: ~s~n", [Polymer]),
-        io:format("Reduced Polymer: ~s~n", [Reduced]),
+        %io:format("Reduced Polymer: ~s~n", [Reduced]),
         io:format("Units: ~p~n", [length(Reduced)]),
+        Units = [begin
+                     NewPolymer = lists:filter(
+                                    fun(Elem) ->
+                                            not string:equal([Elem], [Char], true)
+                                    end, Polymer),
+                     %io:format("Char: ~c, Polymer: ~p~n", [Char, NewPolymer]),
+                     NewReduced = reduce_polymer(NewPolymer),
+                     {length(NewReduced), [Char]}
+                 end || Char <- "abcdefghijklmnopqrstuvwxyz"],
+        io:format("~p~n", [lists:min(Units)]),
         file:write_file("output.data", Reduced);
 main([]) ->
     usage().
@@ -19,6 +34,9 @@ read_file(Filename) ->
     {ok, Bin} = file:read_file(Filename),
     Polymer = binary_to_list(Bin),
     {ok, Polymer}.
+
+%remove_characters(Polymer, Character) ->
+
 
 -spec reduce_polymer(Polymer :: string()) -> string().
 reduce_polymer(Polymer) ->
